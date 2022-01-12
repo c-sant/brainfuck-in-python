@@ -39,11 +39,17 @@ class BrainfuckException(Exception):
     """
 
 class Brainfuck:
-    def __init__(self, safe: bool = True, memory_size: int = 30000):
-        self.data = np.array([0] * memory_size)
-        self.data = self.data.astype(np.ubyte)
+    def __init__(self, memory_size: int = 30000, safe: bool = True):
+        if memory_size < 0:
+            raise ValueError('memory size cannot be negative')
+            
+        self._data = np.array([0] * memory_size)
+        self._data = self._data.astype(np.ubyte)
         self.safe = safe
-
+    
+    @property
+    def data(self):
+        return self._data
 
     def run_file(self, file_path: str):
         if not file_path.endswith('.b') and not file_path.endswith('.bf'):
@@ -119,7 +125,7 @@ class Brainfuck:
         while current < len(source):
             match source[current]:
                 case '>':
-                    if ptr == 29999:
+                    if ptr == (len(self.data) - 1):
                         self.__report_error("pointer out of range", line, col)
                         return True
 
